@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kas juoksis paskutinis?</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .login-screen {
+            display: block;
+        }
+
+        .game-screen {
+            display: none;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            min-width: 120px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .premise-display {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .users-list {
+            margin: 30px 0;
+        }
+
+        .user-card {
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .vote-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .vote-btn {
+            background: none;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .vote-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .laugh-btn {
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+
+        .laugh-btn:hover {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .minus-btn {
+            border-color: #f44336;
+            color: #f44336;
+        }
+
+        .minus-btn:hover {
+            background: #f44336;
+            color: white;
+        }
+
+        .vote-count {
+            font-weight: bold;
+            min-width: 30px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            background: #f0f0f0;
+        }
+
+        .current-user {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .premise-counter {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .premise-display {
+                font-size: 20px;
+                padding: 20px;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loginScreen" class="login-screen">
+            <h1>🎭 Premise Game</h1>
+            <div class="input-group">
+                <input type="text" id="nameInput" placeholder="Įvesk savo vardą..." maxlength="20">
+            </div>
+            <button class="btn" id="joinBtn">Prisijungti</button>
+        </div>
+
+        <div id="gameScreen" class="game-screen">
+            <h1>🎭 Premise Game</h1>
+            <div class="premise-counter">
+                Premise <span id="premiseNumber">1</span> iš <span id="totalPremises">35</span>
+            </div>
+            <div class="premise-display" id="premiseDisplay"></div>
+            
+            <div class="navigation">
+                <button class="btn" id="prevBtn" onclick="previousPremise()" disabled>⬅️ Atgal</button>
+                <button class="btn" id="nextBtn" onclick="nextPremise()">Toliau ➡️</button>
+            </div>
+
+            <div class="users-list" id="usersList"></div>
+        </div>
+    </div>
+
+    <script>
+        const premises = [
+            "Seksas su manimi, kaip egzaminas...",
+            "Mūsų ginčai – kaip UNO partija...",
+            "Mano veidas, kaip pirmadienio rytas...",
+            "Mano dantys,kaip senos klaviatūros klavišai...",
+            "Mano žvilgsnis, kaip Wi-Fi signalas ...",
+            "Mano penis, kaip USB kištukas...",
+            "Mūsų rimti pokalbiai kaip...",
+            "Mano penis – kaip seni batai...",
+            "Mano mama – kaip Google Translate...",
+            "Mano vagina – kaip pašto skyrius...",
+            "Mūsų bendri draugai kaip...",
+            "Seksas su manimi – kaip Lietuvos televizija...",
+            "Mano penis – kaip pasas per atostogas...",
+            "Mano penis – kaip reklama YouTube'e...",
+            "Mano emocijos – kaip Maximos akcijos...",
+            "Mano motyvacija – kaip šaldytuvo lemputė...",
+            "Mano užpakalis – kaip kavos aparatas ofise...",
+            "Seksas su manimi – kaip pirmas kartas prie vairo...",
+            "Mano seksualinis apetitas...",
+            "Seksas su manimi – kaip paštas savaitgalį...",
+            "Mano erogeninės zonos – kaip elektros lizdai...",
+            "Mano G taškas – kaip lobis žemėlapy...",
+            "Mano fetišai – kaip Google istorija...",
+            "Mano kūnas – kaip IKEA instrukcija...",
+            "Mano rankinė – kaip intymus gyvenimas...",
+            "Mano klitoris – kaip paštas sekmadieniais...",
+            "Mano šuo – kaip pensininkas su loterijos bilietu...",
+            "Mano batai – kaip senos draugystės...",
+            "Mano santykiai su sportu – kaip TV antena ant stogo...",
+            "Mano ryšys su gimine – kaip Bluetooth...",
+            "Mano sveikata – kaip senas dviratis...",
+            "Mano dienos tikslai – kaip Wi-Fi prie jūros...",
+            "Mano spinta – kaip vaikystės pasakos...",
+            "Mano važiavimas viešuoju transportu – kaip socialinis eksperimentas...",
+            "Mano dienos produktyvumas kaip..."
+             ];
+
+        let users = [];
+        let currentUser = '';
+        let currentPremiseIndex = 0;
+
+        function joinGame() {
+            const nameInput = document.getElementById('nameInput');
+            const name = nameInput.value.trim();
+            
+            console.log('Attempting to join with name:', name); // Debug log
+            
+            if (name === '' || name.length === 0) {
+                alert('Prašome įvesti vardą!');
+                nameInput.focus();
+                return;
+            }
+
+            currentUser = name;
+            
+            // Check if user already exists
+            const existingUser = users.find(user => user.name === name);
+            if (!existingUser) {
+                users.push({
+                    name: name,
+                    laughVotes: 0,
+                    minusVotes: 0
+                });
+            }
+
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('gameScreen').style.display = 'block';
+            
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            document.getElementById('premiseDisplay').textContent = premises[currentPremiseIndex];
+            document.getElementById('premiseNumber').textContent = currentPremiseIndex + 1;
+            document.getElementById('totalPremises').textContent = premises.length;
+            
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = currentPremiseIndex === 0;
+            document.getElementById('nextBtn').disabled = currentPremiseIndex === premises.length - 1;
+            
+            updateUsersList();
+        }
+
+        function updateUsersList() {
+            const usersList = document.getElementById('usersList');
+            
+            if (users.length < 2) {
+                usersList.innerHTML = '<p style="color: #666; font-style: italic;">Laukiame dar bent vieno žaidėjo, kad galėtumėte balsuoti...</p>';
+                return;
+            }
+
+            usersList.innerHTML = '';
+            
+            users.forEach(user => {
+                const userCard = document.createElement('div');
+                userCard.className = 'user-card';
+                if (user.name === currentUser) {
+                    userCard.classList.add('current-user');
+                }
+                
+                userCard.innerHTML = `
+                    <div class="user-name">${user.name}</div>
+                    <div class="vote-section">
+                        <button class="vote-btn laugh-btn" onclick="vote('${user.name}', 'laugh')" ${user.name === currentUser ? 'disabled' : ''}>😂</button>
+                        <span class="vote-count">${user.laughVotes}</span>
+                        <button class="vote-btn minus-btn" onclick="vote('${user.name}', 'minus')" ${user.name === currentUser ? 'disabled' : ''}>➖</button>
+                        <span class="vote-count">${user.minusVotes}</span>
+                    </div>
+                `;
+                
+                usersList.appendChild(userCard);
+            });
+        }
+
+        function vote(userName, voteType) {
+            if (userName === currentUser) return; // Can't vote for yourself
+            
+            const user = users.find(u => u.name === userName);
+            if (user) {
+                if (voteType === 'laugh') {
+                    user.laughVotes++;
+                } else if (voteType === 'minus') {
+                    user.minusVotes++;
+                }
+                updateUsersList();
+            }
+        }
+
+        function nextPremise() {
+            if (currentPremiseIndex < premises.length - 1) {
+                currentPremiseIndex++;
+                updateDisplay();
+            }
+        }
+
+        function previousPremise() {
+            if (currentPremiseIndex > 0) {
+                currentPremiseIndex--;
+                updateDisplay();
+            }
+        }
+
+        // Allow Enter key to join game
+        document.addEventListener('DOMContentLoaded', function() {
+            const nameInput = document.getElementById('nameInput');
+            const joinButton = document.getElementById('joinBtn');
+            
+            nameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    joinGame();
+                }
+            });
+            
+            // Also allow clicking the button
+            joinButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                joinGame();
+            });
+            
+            // Focus on input when page loads
+            nameInput.focus();
+        });
+
+        // Initialize display
+        document.getElementById('totalPremises').textContent = premises.length;
+    </script>
+</body>
+</html>
