@@ -32,39 +32,11 @@
             backdrop-filter: blur(10px);
         }
 
-        .login-screen {
-            display: block;
-        }
-
-        .game-screen {
-            display: none;
-        }
-
         h1 {
             color: #333;
             margin-bottom: 30px;
             font-size: 2.5em;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .input-group {
-            margin-bottom: 25px;
-        }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 18px;
-            transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 15px rgba(102, 126, 234, 0.3);
         }
 
         .btn {
@@ -190,15 +162,20 @@
             background: #f0f0f0;
         }
 
-        .current-user {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-        }
-
         .premise-counter {
             color: #666;
             font-size: 16px;
             margin-bottom: 20px;
+        }
+
+        .winner-badge {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-left: 10px;
         }
 
         @media (max-width: 600px) {
@@ -225,33 +202,23 @@
 </head>
 <body>
     <div class="container">
-        <div id="loginScreen" class="login-screen">
-            <h1>🎭 Kas juoksis paskutinis?</h1>
-            <div class="input-group">
-                <input type="text" id="nameInput" placeholder="Įvesk savo vardą..." maxlength="20">
-            </div>
-            <button class="btn" id="joinBtn">Prisijungti</button>
+        <h1>🎭 Kas juoksis paskutinis</h1>
+        <div class="premise-counter">
+            Premisas <span id="premiseNumber">1</span> iš <span id="totalPremises">35</span>
+        </div>
+        <div class="premise-display" id="premiseDisplay"></div>
+        
+        <div class="navigation">
+            <button class="btn" id="prevBtn" onclick="previousPremise()" disabled>⬅️ Atgal</button>
+            <button class="btn" id="nextBtn" onclick="nextPremise()">Kitas premisas ➡️</button>
         </div>
 
-        <div id="gameScreen" class="game-screen">
-            <h1>🎭 Kas juoksis paskutinis?</h1>
-            <div class="premise-counter">
-                Premise <span id="premiseNumber">1</span> iš <span id="totalPremises">35</span>
-            </div>
-            <div class="premise-display" id="premiseDisplay"></div>
-            
-            <div class="navigation">
-                <button class="btn" id="prevBtn" onclick="previousPremise()" disabled>⬅️ Atgal</button>
-                <button class="btn" id="nextBtn" onclick="nextPremise()">Toliau ➡️</button>
-            </div>
-
-            <div class="users-list" id="usersList"></div>
-        </div>
     </div>
 
     <script>
         const premises = [
-              "Seksas su manimi, kaip egzaminas...",
+        
+            "Seksas su manimi, kaip egzaminas...",
             "Mūsų ginčai – kaip UNO partija...",
             "Mano veidas, kaip pirmadienio rytas...",
             "Mano dantys,kaip senos klaviatūros klavišai...",
@@ -288,130 +255,21 @@
             "Mano dienos produktyvumas kaip..."
         ];
 
-        let users = [];
-        let currentUser = '';
+
         let currentPremiseIndex = 0;
-
-        function joinGame() {
-            const nameInput = document.getElementById('nameInput');
-            const name = nameInput.value.trim();
-            
-            console.log('Attempting to join with name:', name); // Debug log
-            
-            if (name === '' || name.length === 0) {
-                alert('Prašome įvesti vardą!');
-                nameInput.focus();
-                return;
-            }
-
-            currentUser = name;
-            
-            // Check if user already exists
-            const existingUser = users.find(user => user.name === name);
-            if (!existingUser) {
-                users.push({
-                    name: name,
-                    laughVotes: 0,
-                    minusVotes: 0
-                });
-            }
-
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('gameScreen').style.display = 'block';
-            
-            updateDisplay();
-        }
 
         function updateDisplay() {
             document.getElementById('premiseDisplay').textContent = premises[currentPremiseIndex];
             document.getElementById('premiseNumber').textContent = currentPremiseIndex + 1;
             document.getElementById('totalPremises').textContent = premises.length;
             
-            // Update navigation buttons
             document.getElementById('prevBtn').disabled = currentPremiseIndex === 0;
             document.getElementById('nextBtn').disabled = currentPremiseIndex === premises.length - 1;
             
             updateUsersList();
         }
 
-        function updateUsersList() {
-            const usersList = document.getElementById('usersList');
-            
-            if (users.length < 2) {
-                usersList.innerHTML = `
-                    <div class="user-card current-user">
-                        <div class="user-name">${currentUser} (Tu)</div>
-                        <div class="vote-section">
-                            <span style="color: rgba(255,255,255,0.7);">Laukiame daugiau žaidėjų...</span>
-                        </div>
-                    </div>
-                    <div style="margin: 20px 0;">
-                        <p style="color: #666; font-style: italic; margin-bottom: 15px;">Laukiame dar bent vieno žaidėjo, kad galėtumėte balsuoti...</p>
-                        <button class="btn" onclick="addTestUsers()" style="background: linear-gradient(45deg, #4CAF50, #45a049);">🎮 Pridėti testiniuos žaidėjus</button>
-                    </div>
-                `;
-                return;
-            }
 
-            usersList.innerHTML = '';
-            
-            users.forEach(user => {
-                const userCard = document.createElement('div');
-                userCard.className = 'user-card';
-                if (user.name === currentUser) {
-                    userCard.classList.add('current-user');
-                }
-                
-                const isCurrentUser = user.name === currentUser;
-                const userLabel = isCurrentUser ? `${user.name} (Tu)` : user.name;
-                
-                userCard.innerHTML = `
-                    <div class="user-name">${userLabel}</div>
-                    <div class="vote-section">
-                        <button class="vote-btn laugh-btn" onclick="vote('${user.name}', 'laugh')" ${isCurrentUser ? 'disabled' : ''}>😂</button>
-                        <span class="vote-count">${user.laughVotes}</span>
-                        <button class="vote-btn minus-btn" onclick="vote('${user.name}', 'minus')" ${isCurrentUser ? 'disabled' : ''}>➖</button>
-                        <span class="vote-count">${user.minusVotes}</span>
-                    </div>
-                `;
-                
-                usersList.appendChild(userCard);
-            });
-        }
-
-        function addTestUsers() {
-            const testNames = ['Laura'];
-            const availableNames = testNames.filter(name => 
-                !users.some(user => user.name === name) && name !== currentUser
-            );
-            
-            // Add 2-3 test users
-            const namesToAdd = availableNames.slice(0, Math.min(3, availableNames.length));
-            
-            namesToAdd.forEach(name => {
-                users.push({
-                    name: name,
-                    laughVotes: Math.floor(Math.random() * 5),
-                    minusVotes: Math.floor(Math.random() * 3)
-                });
-            });
-            
-            updateUsersList();
-        }
-
-        function vote(userName, voteType) {
-            if (userName === currentUser) return;
-            
-            const user = users.find(u => u.name === userName);
-            if (user) {
-                if (voteType === 'laugh') {
-                    user.laughVotes++;
-                } else if (voteType === 'minus') {
-                    user.minusVotes++;
-                }
-                updateUsersList();
-            }
-        }
 
         function nextPremise() {
             if (currentPremiseIndex < premises.length - 1) {
@@ -428,25 +286,8 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            const nameInput = document.getElementById('nameInput');
-            const joinButton = document.getElementById('joinBtn');
-            
-            nameInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    joinGame();
-                }
-            });
-            
-            joinButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                joinGame();
-            });
-            
-            nameInput.focus();
+            updateDisplay();
         });
-
-        document.getElementById('totalPremises').textContent = premises.length;
     </script>
 </body>
 </html>
