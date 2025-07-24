@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kas juoksis paskutinis?</title>
+    <title>Premise Completion Game</title>
     <style>
         * {
             margin: 0;
@@ -226,7 +226,7 @@
 <body>
     <div class="container">
         <div id="loginScreen" class="login-screen">
-            <h1>🎭 Premise Game</h1>
+            <h1>🎭 Kas juoksis paskutinis?</h1>
             <div class="input-group">
                 <input type="text" id="nameInput" placeholder="Įvesk savo vardą..." maxlength="20">
             </div>
@@ -234,7 +234,7 @@
         </div>
 
         <div id="gameScreen" class="game-screen">
-            <h1>🎭 Premise Game</h1>
+            <h1>🎭 Kas juoksis paskutinis?</h1>
             <div class="premise-counter">
                 Premise <span id="premiseNumber">1</span> iš <span id="totalPremises">35</span>
             </div>
@@ -252,14 +252,14 @@
     <script>
         const premises = [
             "Seksas su manimi, kaip egzaminas...",
-            "Mūsų ginčai – kaip UNO partija...",
+            "Mūsų ginčai – kaip „UNO" partija...",
             "Mano veidas, kaip pirmadienio rytas...",
             "Mano dantys,kaip senos klaviatūros klavišai...",
             "Mano žvilgsnis, kaip Wi-Fi signalas ...",
             "Mano penis, kaip USB kištukas...",
-            "Mūsų rimti pokalbiai kaip...",
+            "Mūsų „rimti pokalbiai" kaip...",
             "Mano penis – kaip seni batai...",
-            "Mano mama – kaip Google Translate...",
+            "Mano mama – kaip „Google Translate"...",
             "Mano vagina – kaip pašto skyrius...",
             "Mūsų bendri draugai kaip...",
             "Seksas su manimi – kaip Lietuvos televizija...",
@@ -273,20 +273,21 @@
             "Seksas su manimi – kaip paštas savaitgalį...",
             "Mano erogeninės zonos – kaip elektros lizdai...",
             "Mano G taškas – kaip lobis žemėlapy...",
-            "Mano fetišai – kaip Google istorija...",
+            "Mano fetišai – kaip „Google" istorija...",
             "Mano kūnas – kaip IKEA instrukcija...",
             "Mano rankinė – kaip intymus gyvenimas...",
             "Mano klitoris – kaip paštas sekmadieniais...",
             "Mano šuo – kaip pensininkas su loterijos bilietu...",
             "Mano batai – kaip senos draugystės...",
             "Mano santykiai su sportu – kaip TV antena ant stogo...",
-            "Mano ryšys su gimine – kaip Bluetooth...",
+            "Mano ryšys su gimine – kaip \"Bluetooth\"...",
             "Mano sveikata – kaip senas dviratis...",
             "Mano dienos tikslai – kaip Wi-Fi prie jūros...",
             "Mano spinta – kaip vaikystės pasakos...",
             "Mano važiavimas viešuoju transportu – kaip socialinis eksperimentas...",
             "Mano dienos produktyvumas kaip..."
-             ];
+        ];
+        ];
 
         let users = [];
         let currentUser = '';
@@ -338,7 +339,18 @@
             const usersList = document.getElementById('usersList');
             
             if (users.length < 2) {
-                usersList.innerHTML = '<p style="color: #666; font-style: italic;">Laukiame dar bent vieno žaidėjo, kad galėtumėte balsuoti...</p>';
+                usersList.innerHTML = `
+                    <div class="user-card current-user">
+                        <div class="user-name">${currentUser} (Tu)</div>
+                        <div class="vote-section">
+                            <span style="color: rgba(255,255,255,0.7);">Laukiame daugiau žaidėjų...</span>
+                        </div>
+                    </div>
+                    <div style="margin: 20px 0;">
+                        <p style="color: #666; font-style: italic; margin-bottom: 15px;">Laukiame dar bent vieno žaidėjo, kad galėtumėte balsuoti...</p>
+                        <button class="btn" onclick="addTestUsers()" style="background: linear-gradient(45deg, #4CAF50, #45a049);">🎮 Pridėti testiniuos žaidėjus</button>
+                    </div>
+                `;
                 return;
             }
 
@@ -351,12 +363,15 @@
                     userCard.classList.add('current-user');
                 }
                 
+                const isCurrentUser = user.name === currentUser;
+                const userLabel = isCurrentUser ? `${user.name} (Tu)` : user.name;
+                
                 userCard.innerHTML = `
-                    <div class="user-name">${user.name}</div>
+                    <div class="user-name">${userLabel}</div>
                     <div class="vote-section">
-                        <button class="vote-btn laugh-btn" onclick="vote('${user.name}', 'laugh')" ${user.name === currentUser ? 'disabled' : ''}>😂</button>
+                        <button class="vote-btn laugh-btn" onclick="vote('${user.name}', 'laugh')" ${isCurrentUser ? 'disabled' : ''}>😂</button>
                         <span class="vote-count">${user.laughVotes}</span>
-                        <button class="vote-btn minus-btn" onclick="vote('${user.name}', 'minus')" ${user.name === currentUser ? 'disabled' : ''}>➖</button>
+                        <button class="vote-btn minus-btn" onclick="vote('${user.name}', 'minus')" ${isCurrentUser ? 'disabled' : ''}>➖</button>
                         <span class="vote-count">${user.minusVotes}</span>
                     </div>
                 `;
@@ -365,8 +380,28 @@
             });
         }
 
+        function addTestUsers() {
+            const testNames = ['Laura'];
+            const availableNames = testNames.filter(name => 
+                !users.some(user => user.name === name) && name !== currentUser
+            );
+            
+            // Add 2-3 test users
+            const namesToAdd = availableNames.slice(0, Math.min(3, availableNames.length));
+            
+            namesToAdd.forEach(name => {
+                users.push({
+                    name: name,
+                    laughVotes: Math.floor(Math.random() * 5),
+                    minusVotes: Math.floor(Math.random() * 3)
+                });
+            });
+            
+            updateUsersList();
+        }
+
         function vote(userName, voteType) {
-            if (userName === currentUser) return; // Can't vote for yourself
+            if (userName === currentUser) return;
             
             const user = users.find(u => u.name === userName);
             if (user) {
@@ -393,7 +428,6 @@
             }
         }
 
-        // Allow Enter key to join game
         document.addEventListener('DOMContentLoaded', function() {
             const nameInput = document.getElementById('nameInput');
             const joinButton = document.getElementById('joinBtn');
@@ -405,17 +439,14 @@
                 }
             });
             
-            // Also allow clicking the button
             joinButton.addEventListener('click', function(e) {
                 e.preventDefault();
                 joinGame();
             });
             
-            // Focus on input when page loads
             nameInput.focus();
         });
 
-        // Initialize display
         document.getElementById('totalPremises').textContent = premises.length;
     </script>
 </body>
